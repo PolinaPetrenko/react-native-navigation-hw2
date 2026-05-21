@@ -1,19 +1,57 @@
-## HW5 Performance Optimization
+# 🌸 BloomApp
 
-### Animation
+BloomApp is a modern flower store mobile application built with React Native and Expo.
 
-- Added press scale animation to `BouquetCard` using React Native `Animated`.
-- The card smoothly scales down on press and returns to normal size after release.
+The project allows users to browse bouquets, search flowers, add products to favorites and cart, manage quantity, complete checkout flow, and view order confirmation.
 
-### Render Optimization
+The application uses API integration, Redux state management, React Navigation, and supports dark mode.
 
-- Wrapped `BouquetCard` in `React.memo`.
-- Added `useMemo` for responsive card width calculation in `HomeScreen`.
-- Added `useCallback` for stable navigation and cart handlers in `HomeScreen`.
-- Added `useMemo` in `CartScreen` for total price calculation.
+## ✨ Features
 
-### Dependency Optimization
+- Browse bouquets from API
+- Search bouquets
+- Product details screen
+- Favorites system
+- Shopping cart with quantity management
+- Checkout flow
+- Success order screen
+- User profile
+- Support screen
+- Dark mode
+- Responsive UI
+- React Navigation
+- Redux Toolkit state management
 
-- Checked `package.json` dependencies.
-- No heavy libraries like `moment` or `lodash` are used.
-- Added `dayjs` as a lightweight date utility alternative instead of `moment`.
+## 🛠 Tech Stack
+
+- React Native
+- Expo
+- React Navigation
+- Redux Toolkit
+- MockAPI
+- JavaScript
+- Expo Vector Icons
+
+## 📸 Screenshots
+
+<img src="./assets/screenshots/7.png" width="250" />
+<img src="./assets/screenshots/8.png" width="250" />
+<img src="./assets/screenshots/9.png" width="250" />
+<img src="./assets/screenshots/10.png" width="250" />
+<img src="./assets/screenshots/11.png" width="250" />
+<img src="./assets/screenshots/12.png" width="250" />
+<img src="./assets/screenshots/13.png" width="250" />
+<img src="./assets/screenshots/14.png" width="250" />
+<img src="./assets/screenshots/15.png" width="250" />
+<img src="./assets/screenshots/16.png" width="250" />
+
+## 🚀 Run Project
+
+```bash
+npm install
+npx expo start
+```
+
+## 👩‍💻 Author
+
+Polina Petrenko

@@ -1,4 +1,4 @@
-import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 
 import RootNavigator from './src/navigation/RootNavigator';
@@ -9,7 +9,9 @@ export default function App() {
   return (
     <Provider store={store}>
       <ThemeProvider>
-        <RootNavigator />
+        <NavigationContainer>
+          <RootNavigator />
+        </NavigationContainer>
       </ThemeProvider>
     </Provider>
   );

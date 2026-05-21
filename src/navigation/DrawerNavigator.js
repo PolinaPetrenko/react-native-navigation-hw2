@@ -1,9 +1,9 @@
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
-import TabNavigator from './TabNavigator';
-import SupportScreen from '../screens/SupportScreen';
 import { SCREENS } from '../constants/screens';
+import SupportScreen from '../screens/SupportScreen';
+import TabNavigator from './TabNavigator';
 
 const Drawer = createDrawerNavigator();
 
@@ -32,9 +32,8 @@ export default function DrawerNavigator() {
         component={SupportScreen}
         options={{
           title: 'Support',
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="help-circle-outline" size={size} color={color} />
-          ),
+          drawerItemStyle: { display: 'none' },
+          headerShown: true,
         }}
       />
     </Drawer.Navigator>

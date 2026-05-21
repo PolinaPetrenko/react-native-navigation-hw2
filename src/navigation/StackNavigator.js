@@ -1,8 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import { SCREENS } from '../constants/screens';
 import HomeScreen from '../screens/HomeScreen';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
-import { SCREENS } from '../constants/screens';
+import SuccessScreen from '../screens/SuccessScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +25,12 @@ export default function StackNavigator() {
           headerTintColor: '#FF2D6F',
         }}
       />
+
+      <Stack.Screen
+  name={SCREENS.SUCCESS}
+  component={SuccessScreen}
+  options={{ headerShown: false }}
+/>
     </Stack.Navigator>
   );
 }

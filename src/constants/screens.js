@@ -5,4 +5,7 @@ export const SCREENS = {
   PROFILE: 'Profile',
   MAIN_TABS: 'MainTabs',
   SUPPORT: 'Support',
+  FAVORITES: 'Favorites',
+  CHECKOUT: 'Checkout',
+  SUCCESS: 'Success',
 };

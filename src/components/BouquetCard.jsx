@@ -10,16 +10,25 @@ import {
   View,
 } from 'react-native';
 
+import { useDispatch, useSelector } from 'react-redux';
+
 import { ThemeContext } from '../context/ThemeContext';
+import { toggleFavorite } from '../store/favoritesSlice';
 
 function BouquetCard({ bouquet, item, onPress, onAddToCart, width }) {
   const data = bouquet || item;
   const scale = useRef(new Animated.Value(1)).current;
 
+  const dispatch = useDispatch();
+  const favoriteIds = useSelector((state) => state.favorites);
+
   const { theme } = useContext(ThemeContext);
   const isDark = theme === 'dark';
 
   if (!data) return null;
+
+  const favoriteKey = String(data.id || data.name);
+  const isFavorite = favoriteIds.includes(favoriteKey);
 
   const handlePressIn = () => {
     Animated.spring(scale, {
@@ -34,6 +43,10 @@ function BouquetCard({ bouquet, item, onPress, onAddToCart, width }) {
       friction: 4,
       useNativeDriver: true,
     }).start();
+  };
+
+  const handleFavoritePress = () => {
+    dispatch(toggleFavorite(favoriteKey));
   };
 
   return (
@@ -57,8 +70,15 @@ function BouquetCard({ bouquet, item, onPress, onAddToCart, width }) {
           <Text style={styles.timeText}>{data.deliveryTime}</Text>
         </View>
 
-        <TouchableOpacity style={styles.favoriteButton}>
-          <Ionicons name="heart-outline" size={20} color="#666" />
+        <TouchableOpacity
+          style={styles.favoriteButton}
+          onPress={handleFavoritePress}
+        >
+          <Ionicons
+            name={isFavorite ? 'heart' : 'heart-outline'}
+            size={20}
+            color={isFavorite ? '#FF2D6F' : '#666'}
+          />
         </TouchableOpacity>
 
         <View style={styles.content}>
@@ -127,6 +147,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 14,
+    paddingBottom: 18,
   },
   title: {
     fontSize: 20,

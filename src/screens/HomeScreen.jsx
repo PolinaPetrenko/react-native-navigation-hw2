@@ -11,6 +11,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
+  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -20,7 +22,6 @@ import { useDispatch } from 'react-redux';
 
 import { fetchBouquets } from '../api/bouquetsApi';
 import BouquetCard from '../components/BouquetCard';
-import QuantityStepper from '../components/QuantityStepper';
 import { colors } from '../constants/colors';
 import { SCREENS } from '../constants/screens';
 import { ThemeContext } from '../context/ThemeContext';
@@ -32,6 +33,7 @@ export default function HomeScreen({ navigation }) {
   const isDark = theme === 'dark';
 
   const [bouquets, setBouquets] = useState([]);
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -41,8 +43,16 @@ export default function HomeScreen({ navigation }) {
     return width > 700 ? width / 3 - 32 : width / 2 - 24;
   }, [width]);
 
+  const filteredBouquets = useMemo(() => {
+    return bouquets.filter((item) =>
+      item.name.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [bouquets, search]);
+
   const screenBackground = isDark ? '#111' : colors.background;
+  const cardBackground = isDark ? '#1E1E1E' : '#FFE4ED';
   const mainTextColor = isDark ? '#fff' : colors.textPrimary;
+  const mutedTextColor = isDark ? '#BDBDBD' : colors.textSecondary;
 
   useEffect(() => {
     const loadBouquets = async () => {
@@ -59,10 +69,6 @@ export default function HomeScreen({ navigation }) {
 
     loadBouquets();
   }, []);
-
-  const handleOpenDrawer = useCallback(() => {
-    navigation.openDrawer();
-  }, [navigation]);
 
   const handleOpenDetails = useCallback(
     (item) => {
@@ -99,44 +105,79 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <ScrollView
-      style={[
-        styles.screen,
-        { backgroundColor: screenBackground },
-      ]}
+      style={[styles.screen, { backgroundColor: screenBackground }]}
+      showsVerticalScrollIndicator={false}
     >
-      <View style={styles.header}>
-        <Text
+      <View style={styles.brandHeader}>
+        <View style={styles.brandLeft}>
+          <Ionicons name="flower-outline" size={22} color={colors.primary} />
+          <Text style={styles.brandText}>BloomApp</Text>
+        </View>
+      </View>
+
+      <View style={styles.topHeader}>
+        <View>
+          <Text style={[styles.hello, { color: mainTextColor }]}>
+            Hello, Polina
+          </Text>
+          <Text style={[styles.subtitle, { color: mutedTextColor }]}>
+            What blooms today?
+          </Text>
+        </View>
+
+        <TouchableOpacity
           style={[
-            styles.logo,
-            { color: isDark ? '#fff' : colors.primary },
+            styles.profileCircle,
+            { backgroundColor: isDark ? '#2A2A2A' : '#FFE4ED' },
           ]}
+          onPress={() => navigation.navigate(SCREENS.PROFILE)}
         >
-          BloomApp
+          <Text style={styles.profileLetter}>P</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View
+        style={[
+          styles.searchBox,
+          { backgroundColor: isDark ? '#1E1E1E' : '#F5F5F5' },
+        ]}
+      >
+        <Ionicons name="search-outline" size={20} color="#999" />
+
+        <TextInput
+          placeholder="Search bouquets..."
+          placeholderTextColor="#999"
+          value={search}
+          onChangeText={setSearch}
+          style={[styles.searchInput, { color: mainTextColor }]}
+        />
+
+        <Ionicons name="options-outline" size={22} color={colors.primary} />
+      </View>
+
+      <View style={[styles.promoCard, { backgroundColor: cardBackground }]}>
+        <Text style={styles.promoLabel}>FEATURED</Text>
+        <Text style={[styles.promoTitle, { color: mainTextColor }]}>
+          Same-day delivery
+        </Text>
+        <Text style={[styles.promoText, { color: mutedTextColor }]}>
+          Order before 4pm
         </Text>
 
-        <Ionicons
-          name="menu"
-          size={28}
-          color={colors.primary}
-          onPress={handleOpenDrawer}
-        />
+        <TouchableOpacity style={styles.promoButton}>
+          <Text style={styles.promoButtonText}>Shop now</Text>
+          <Ionicons name="arrow-forward" size={16} color="#fff" />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.sectionHeader}>
-        <Text
-          style={[
-            styles.sectionTitle,
-            { color: mainTextColor },
-          ]}
-        >
+        <Text style={[styles.sectionTitle, { color: mainTextColor }]}>
           Popular bouquets
         </Text>
-
-        <QuantityStepper value={1} onChange={() => {}} />
       </View>
 
       <View style={styles.productsGrid}>
-        {bouquets.map((item) => (
+        {filteredBouquets.map((item) => (
           <BouquetCard
             key={item.id || item.name}
             bouquet={item}
@@ -155,9 +196,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: Platform.select({
-      ios: 60,
-      android: 40,
-      default: 30,
+      ios: 40,
+      android: 34,
+      default: 24,
     }),
   },
 
@@ -167,27 +208,117 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  header: {
+  brandHeader: {
+    marginBottom: 22,
+  },
+
+  brandLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+
+  brandText: {
+    color: colors.primary,
+    fontSize: 18,
+    fontWeight: '800',
+  },
+
+  topHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 18,
   },
 
-  logo: {
-    fontSize: 30,
+  hello: {
+    fontSize: 28,
+    fontWeight: '800',
+  },
+
+  subtitle: {
+    marginTop: 4,
+    fontSize: 15,
+    fontWeight: '500',
+  },
+
+  profileCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  profileLetter: {
+    color: colors.primary,
+    fontSize: 18,
+    fontWeight: '800',
+  },
+
+  searchBox: {
+    height: 54,
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 22,
+  },
+
+  searchInput: {
+    flex: 1,
+    marginHorizontal: 10,
+    fontSize: 15,
+    outlineStyle: 'none',
+  },
+
+  promoCard: {
+    borderRadius: 26,
+    padding: 18,
+    marginBottom: 24,
+  },
+
+  promoLabel: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    marginBottom: 6,
+  },
+
+  promoTitle: {
+    fontSize: 23,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+
+  promoText: {
+    fontSize: 15,
+    marginBottom: 14,
+  },
+
+  promoButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.primary,
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+
+  promoButtonText: {
+    color: '#fff',
     fontWeight: '800',
   },
 
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
 
   sectionTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '800',
   },
 
@@ -195,6 +326,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 16,
+    paddingBottom: 90,
   },
 
   errorText: {

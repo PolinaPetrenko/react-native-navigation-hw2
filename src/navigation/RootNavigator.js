@@ -1,12 +1,16 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import DrawerNavigator from './DrawerNavigator';
+import { SCREENS } from '../constants/screens';
+import SupportScreen from '../screens/SupportScreen';
+import TabNavigator from './TabNavigator';
+
+const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
   return (
-    <NavigationContainer>
-      {/* Root navigator connects Drawer, Tabs and Stack navigation */}
-      <DrawerNavigator />
-    </NavigationContainer>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name={SCREENS.MAIN_TABS} component={TabNavigator} />
+      <Stack.Screen name={SCREENS.SUPPORT} component={SupportScreen} />
+    </Stack.Navigator>
   );
 }
