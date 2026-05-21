@@ -1,54 +1,60 @@
-import React, { useState } from 'react';
-import { Image, TouchableOpacity, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../constants/colors';
+import React, { useContext } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function BouquetCard({ bouquet, width, onPress, onAddToCart }) {
-  const [isFavorite, setIsFavorite] = useState(false);
+import { ThemeContext } from '../context/ThemeContext';
+
+export default function BouquetCard({
+  bouquet,
+  item,
+  onPress,
+  onAddToCart,
+  width,
+}) {
+  const data = bouquet || item;
+
+  const { theme } = useContext(ThemeContext);
+  const isDark = theme === 'dark';
+
+  if (!data) return null;
 
   return (
     <TouchableOpacity
-      activeOpacity={0.9}
+      style={[
+        styles.card,
+        {
+          width,
+          backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF',
+        },
+      ]}
       onPress={onPress}
-      style={[styles.card, width ? { width } : null]}
+      activeOpacity={0.9}
     >
-      <View style={styles.imageWrap}>
-        <Image source={{ uri: bouquet.imageUrl }} style={styles.image} />
+      <Image source={{ uri: data.imageUrl }} style={styles.image} />
 
-        <TouchableOpacity
-          style={styles.heart}
-          onPress={() => setIsFavorite(!isFavorite)}
-        >
-          <Ionicons
-            name={isFavorite ? 'heart' : 'heart-outline'}
-            size={18}
-            color={isFavorite ? colors.primary : colors.textPrimary}
-          />
-        </TouchableOpacity>
-
-        <View style={styles.delivery}>
-          <Ionicons name="time-outline" size={12} color="#fff" />
-          <Text style={styles.deliveryText}>{bouquet.deliveryTime}</Text>
-        </View>
+      <View style={styles.timeBadge}>
+        <Ionicons name="time-outline" size={12} color="#fff" />
+        <Text style={styles.timeText}>{data.deliveryTime}</Text>
       </View>
 
+      <TouchableOpacity style={styles.favoriteButton}>
+        <Ionicons name="heart-outline" size={20} color="#666" />
+      </TouchableOpacity>
+
       <View style={styles.content}>
-        <Text numberOfLines={1} style={styles.title}>
-          {bouquet.name}
+        <Text style={[styles.title, { color: isDark ? '#fff' : '#111' }]}>
+          {data.name}
         </Text>
 
-        <View style={styles.row}>
-          <Ionicons name="star" size={12} color="#FFB800" />
-          <Text style={styles.rating}>
-            {bouquet.rating} ({bouquet.reviewsCount})
-          </Text>
-        </View>
+        <Text style={[styles.rating, { color: isDark ? '#BDBDBD' : '#666' }]}>
+          ⭐ {data.rating} ({data.reviewsCount})
+        </Text>
 
-        <View style={styles.priceRow}>
-          <Text style={styles.price}>${bouquet.price}</Text>
+        <View style={styles.bottomRow}>
+          <Text style={styles.price}>${data.price}</Text>
 
-          <TouchableOpacity style={styles.plus} onPress={onAddToCart}>
-            <Ionicons name="cart-outline" size={17} color="#fff" />
+          <TouchableOpacity style={styles.cartButton} onPress={onAddToCart}>
+            <Ionicons name="cart-outline" size={18} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
@@ -58,89 +64,70 @@ export default function BouquetCard({ bouquet, width, onPress, onAddToCart }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
+    borderRadius: 24,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 4,
-  },
-  imageWrap: {
-    width: '100%',
-    aspectRatio: 1,
-    backgroundColor: colors.secondary,
-    position: 'relative',
+    marginBottom: 20,
   },
   image: {
     width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    height: 240,
   },
-  heart: {
+  timeBadge: {
     position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.94)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  delivery: {
-    position: 'absolute',
-    bottom: 10,
-    left: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 999,
+    left: 12,
+    top: 12,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(0,0,0,0.55)',
   },
-  deliveryText: {
+  timeText: {
     color: '#fff',
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
+    marginLeft: 4,
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: '#fff',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
-    padding: 12,
+    padding: 14,
   },
   title: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: '700',
-    color: colors.textPrimary,
     marginBottom: 4,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
   rating: {
-    fontSize: 12,
-    color: colors.textSecondary,
+    fontSize: 13,
+    marginBottom: 10,
   },
-  priceRow: {
+  bottomRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 8,
+    alignItems: 'center',
   },
   price: {
-    fontSize: 18,
+    color: '#FF2D6F',
+    fontSize: 28,
     fontWeight: '800',
-    color: colors.primary,
   },
-  plus: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
+  cartButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#FF2D6F',
     justifyContent: 'center',
+    alignItems: 'center',
   },
 });

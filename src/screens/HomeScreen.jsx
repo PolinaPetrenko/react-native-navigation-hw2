@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  FlatList,
   Platform,
   ScrollView,
   StyleSheet,
@@ -11,20 +10,26 @@ import {
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
+import { useDispatch } from 'react-redux';
 
+import { fetchBouquets } from '../api/bouquetsApi';
 import BouquetCard from '../components/BouquetCard';
 import QuantityStepper from '../components/QuantityStepper';
 import { colors } from '../constants/colors';
 import { SCREENS } from '../constants/screens';
-import { fetchBouquets } from '../api/bouquetsApi';
+import { ThemeContext } from '../context/ThemeContext';
+import { addItem } from '../store/cartSlice';
 
 export default function HomeScreen({ navigation }) {
+  const dispatch = useDispatch();
+  const { theme } = useContext(ThemeContext);
+  const isDark = theme === 'dark';
+
   const [bouquets, setBouquets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const { width } = useWindowDimensions();
-
   const cardWidth = width > 700 ? width / 3 - 32 : width / 2 - 24;
 
   useEffect(() => {
@@ -45,25 +50,49 @@ export default function HomeScreen({ navigation }) {
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View
+        style={[
+          styles.center,
+          { backgroundColor: isDark ? '#111' : colors.background },
+        ]}
+      >
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text>Loading bouquets...</Text>
+        <Text style={{ color: isDark ? '#fff' : colors.textPrimary }}>
+          Loading bouquets...
+        </Text>
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.center}>
-        <Text>{error}</Text>
+      <View
+        style={[
+          styles.center,
+          { backgroundColor: isDark ? '#111' : colors.background },
+        ]}
+      >
+        <Text style={styles.errorText}>{error}</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.screen}>
+    <ScrollView
+      style={[
+        styles.screen,
+        { backgroundColor: isDark ? '#111' : colors.background },
+      ]}
+    >
       <View style={styles.header}>
-        <Text style={styles.logo}>BloomApp</Text>
+        <Text
+          style={[
+            styles.logo,
+            { color: isDark ? '#fff' : colors.primary },
+          ]}
+        >
+          BloomApp
+        </Text>
 
         <Ionicons
           name="menu"
@@ -74,14 +103,22 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Popular bouquets</Text>
+        <Text
+          style={[
+            styles.sectionTitle,
+            { color: isDark ? '#fff' : colors.textPrimary },
+          ]}
+        >
+          Popular bouquets
+        </Text>
+
         <QuantityStepper value={1} onChange={() => {}} />
       </View>
 
       <View style={styles.productsGrid}>
         {bouquets.map((item) => (
           <BouquetCard
-            key={item.id}
+            key={item.id || item.name}
             bouquet={item}
             width={cardWidth}
             onPress={() =>
@@ -89,7 +126,7 @@ export default function HomeScreen({ navigation }) {
                 product: item,
               })
             }
-            onAddToCart={() => console.log('Add:', item.name)}
+            onAddToCart={() => dispatch(addItem(item))}
           />
         ))}
       </View>
@@ -100,7 +137,6 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.background,
     paddingHorizontal: 16,
     paddingTop: Platform.select({
       ios: 60,
@@ -125,7 +161,6 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 30,
     fontWeight: '800',
-    color: colors.primary,
   },
 
   sectionHeader: {
@@ -138,12 +173,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 28,
     fontWeight: '800',
-    color: colors.textPrimary,
   },
 
   productsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 16,
+  },
+
+  errorText: {
+    fontSize: 16,
+    color: '#EF4444',
+    fontWeight: '700',
   },
 });
