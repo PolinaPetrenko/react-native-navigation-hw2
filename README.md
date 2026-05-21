@@ -1,21 +1,22 @@
-## HW3 API Integration
-
-This branch adds API integration to the BloomApp project.
+This homework adds API integration using MockAPI.
 
 ### Features
 
-- Public REST API integration
-- Fetch API request in `src/api/bouquetsApi.js`
-- Loading state with `ActivityIndicator`
+- REST API integration
+
+- Fetch request in `bouquetsApi.js`
+
+- Dynamic bouquet rendering
+
+- ActivityIndicator loading state
+
 - Error handling
-- API data displayed with `BouquetCard`
-- Navigation from API item to Product Details screen
+
+- Navigation to Product Details
 
 ### API
 
-Data is loaded from:
-
-`https://jsonplaceholder.typicode.com/photos?_limit=6`
+https://6a0f34ca1736097c360b49cf.mockapi.io/bouquets
 
 ### Screenshots
 
