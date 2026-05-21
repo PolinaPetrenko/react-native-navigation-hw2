@@ -1,27 +1,19 @@
-## HW4 State Management
+## HW5 Performance Optimization
 
-This homework adds Context API and Redux state management.
+### Animation
 
-### Context API
+- Added press scale animation to `BouquetCard` using React Native `Animated`.
+- The card smoothly scales down on press and returns to normal size after release.
 
-- ThemeContext created
-- Global light / dark theme
-- Theme toggle in Profile screen
-- Theme applied to multiple screens
+### Render Optimization
 
-### Redux
+- Wrapped `BouquetCard` in `React.memo`.
+- Added `useMemo` for responsive card width calculation in `HomeScreen`.
+- Added `useCallback` for stable navigation and cart handlers in `HomeScreen`.
+- Added `useMemo` in `CartScreen` for total price calculation.
 
-- Redux Toolkit store configured
-- cartSlice created
-- Add and remove bouquet from cart
-- useSelector and useDispatch implemented
+### Dependency Optimization
 
-### Screenshots
-
-### Redux Cart
-
-![Redux](./assets/screenshots/6.png)
-
-### Context Theme
-
-![Context](./assets/screenshots/5.png)(./assets/screenshots/4.png)
+- Checked `package.json` dependencies.
+- No heavy libraries like `moment` or `lodash` are used.
+- Added `dayjs` as a lightweight date utility alternative instead of `moment`.

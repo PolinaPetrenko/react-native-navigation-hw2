@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -30,7 +36,13 @@ export default function HomeScreen({ navigation }) {
   const [error, setError] = useState('');
 
   const { width } = useWindowDimensions();
-  const cardWidth = width > 700 ? width / 3 - 32 : width / 2 - 24;
+
+  const cardWidth = useMemo(() => {
+    return width > 700 ? width / 3 - 32 : width / 2 - 24;
+  }, [width]);
+
+  const screenBackground = isDark ? '#111' : colors.background;
+  const mainTextColor = isDark ? '#fff' : colors.textPrimary;
 
   useEffect(() => {
     const loadBouquets = async () => {
@@ -48,30 +60,38 @@ export default function HomeScreen({ navigation }) {
     loadBouquets();
   }, []);
 
+  const handleOpenDrawer = useCallback(() => {
+    navigation.openDrawer();
+  }, [navigation]);
+
+  const handleOpenDetails = useCallback(
+    (item) => {
+      navigation.navigate(SCREENS.PRODUCT_DETAILS, {
+        product: item,
+      });
+    },
+    [navigation]
+  );
+
+  const handleAddToCart = useCallback(
+    (item) => {
+      dispatch(addItem(item));
+    },
+    [dispatch]
+  );
+
   if (loading) {
     return (
-      <View
-        style={[
-          styles.center,
-          { backgroundColor: isDark ? '#111' : colors.background },
-        ]}
-      >
+      <View style={[styles.center, { backgroundColor: screenBackground }]}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={{ color: isDark ? '#fff' : colors.textPrimary }}>
-          Loading bouquets...
-        </Text>
+        <Text style={{ color: mainTextColor }}>Loading bouquets...</Text>
       </View>
     );
   }
 
   if (error) {
     return (
-      <View
-        style={[
-          styles.center,
-          { backgroundColor: isDark ? '#111' : colors.background },
-        ]}
-      >
+      <View style={[styles.center, { backgroundColor: screenBackground }]}>
         <Text style={styles.errorText}>{error}</Text>
       </View>
     );
@@ -81,7 +101,7 @@ export default function HomeScreen({ navigation }) {
     <ScrollView
       style={[
         styles.screen,
-        { backgroundColor: isDark ? '#111' : colors.background },
+        { backgroundColor: screenBackground },
       ]}
     >
       <View style={styles.header}>
@@ -98,7 +118,7 @@ export default function HomeScreen({ navigation }) {
           name="menu"
           size={28}
           color={colors.primary}
-          onPress={() => navigation.openDrawer()}
+          onPress={handleOpenDrawer}
         />
       </View>
 
@@ -106,7 +126,7 @@ export default function HomeScreen({ navigation }) {
         <Text
           style={[
             styles.sectionTitle,
-            { color: isDark ? '#fff' : colors.textPrimary },
+            { color: mainTextColor },
           ]}
         >
           Popular bouquets
@@ -121,12 +141,8 @@ export default function HomeScreen({ navigation }) {
             key={item.id || item.name}
             bouquet={item}
             width={cardWidth}
-            onPress={() =>
-              navigation.navigate(SCREENS.PRODUCT_DETAILS, {
-                product: item,
-              })
-            }
-            onAddToCart={() => dispatch(addItem(item))}
+            onPress={() => handleOpenDetails(item)}
+            onAddToCart={() => handleAddToCart(item)}
           />
         ))}
       </View>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -16,6 +16,13 @@ export default function CartScreen() {
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
+  const total = useMemo(() => {
+    return cart.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+  }, [cart]);
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Cart</Text>
@@ -23,24 +30,30 @@ export default function CartScreen() {
       {cart.length === 0 ? (
         <Text style={styles.empty}>Cart is empty</Text>
       ) : (
-        cart.map((item) => (
-          <View key={item.id} style={styles.card}>
-            <View>
-              <Text style={styles.name}>{item.name}</Text>
+        <>
+          {cart.map((item) => (
+            <View key={item.id} style={styles.card}>
+              <View>
+                <Text style={styles.name}>{item.name}</Text>
 
-              <Text style={styles.details}>
-                ${item.price} × {item.quantity}
-              </Text>
+                <Text style={styles.details}>
+                  ${item.price} × {item.quantity}
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => dispatch(removeItem(item.id))}
+              >
+                <Text style={styles.buttonText}>Remove</Text>
+              </TouchableOpacity>
             </View>
+          ))}
 
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => dispatch(removeItem(item.id))}
-            >
-              <Text style={styles.buttonText}>Remove</Text>
-            </TouchableOpacity>
-          </View>
-        ))
+          <Text style={styles.total}>
+            Total: ${total.toFixed(2)}
+          </Text>
+        </>
       )}
     </ScrollView>
   );
@@ -96,5 +109,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: '700',
+  },
+
+  total: {
+    marginTop: 12,
+    fontSize: 22,
+    fontWeight: '800',
+    color: colors.textPrimary,
   },
 });

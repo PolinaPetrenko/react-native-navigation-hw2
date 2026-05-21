@@ -1,66 +1,91 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useContext } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { memo, useContext, useRef } from 'react';
+import {
+  Animated,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import { ThemeContext } from '../context/ThemeContext';
 
-export default function BouquetCard({
-  bouquet,
-  item,
-  onPress,
-  onAddToCart,
-  width,
-}) {
+function BouquetCard({ bouquet, item, onPress, onAddToCart, width }) {
   const data = bouquet || item;
+  const scale = useRef(new Animated.Value(1)).current;
 
   const { theme } = useContext(ThemeContext);
   const isDark = theme === 'dark';
 
   if (!data) return null;
 
+  const handlePressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.97,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      friction: 4,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
-    <TouchableOpacity
-      style={[
-        styles.card,
-        {
-          width,
-          backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF',
-        },
-      ]}
-      onPress={onPress}
-      activeOpacity={0.9}
-    >
-      <Image source={{ uri: data.imageUrl }} style={styles.image} />
+    <Animated.View style={{ transform: [{ scale }] }}>
+      <Pressable
+        style={[
+          styles.card,
+          {
+            width,
+            backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF',
+          },
+        ]}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      >
+        <Image source={{ uri: data.imageUrl }} style={styles.image} />
 
-      <View style={styles.timeBadge}>
-        <Ionicons name="time-outline" size={12} color="#fff" />
-        <Text style={styles.timeText}>{data.deliveryTime}</Text>
-      </View>
-
-      <TouchableOpacity style={styles.favoriteButton}>
-        <Ionicons name="heart-outline" size={20} color="#666" />
-      </TouchableOpacity>
-
-      <View style={styles.content}>
-        <Text style={[styles.title, { color: isDark ? '#fff' : '#111' }]}>
-          {data.name}
-        </Text>
-
-        <Text style={[styles.rating, { color: isDark ? '#BDBDBD' : '#666' }]}>
-          ⭐ {data.rating} ({data.reviewsCount})
-        </Text>
-
-        <View style={styles.bottomRow}>
-          <Text style={styles.price}>${data.price}</Text>
-
-          <TouchableOpacity style={styles.cartButton} onPress={onAddToCart}>
-            <Ionicons name="cart-outline" size={18} color="#fff" />
-          </TouchableOpacity>
+        <View style={styles.timeBadge}>
+          <Ionicons name="time-outline" size={12} color="#fff" />
+          <Text style={styles.timeText}>{data.deliveryTime}</Text>
         </View>
-      </View>
-    </TouchableOpacity>
+
+        <TouchableOpacity style={styles.favoriteButton}>
+          <Ionicons name="heart-outline" size={20} color="#666" />
+        </TouchableOpacity>
+
+        <View style={styles.content}>
+          <Text style={[styles.title, { color: isDark ? '#fff' : '#111' }]}>
+            {data.name}
+          </Text>
+
+          <Text
+            style={[styles.rating, { color: isDark ? '#BDBDBD' : '#666' }]}
+          >
+            ⭐ {data.rating} ({data.reviewsCount})
+          </Text>
+
+          <View style={styles.bottomRow}>
+            <Text style={styles.price}>${data.price}</Text>
+
+            <TouchableOpacity style={styles.cartButton} onPress={onAddToCart}>
+              <Ionicons name="cart-outline" size={18} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Pressable>
+    </Animated.View>
   );
 }
+
+export default memo(BouquetCard);
 
 const styles = StyleSheet.create({
   card: {
