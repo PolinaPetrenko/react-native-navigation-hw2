@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   Platform,
@@ -13,6 +14,7 @@ import {
 
 import { Ionicons } from '@expo/vector-icons';
 
+import { fetchBouquets } from '../api/bouquetsApi';
 import BouquetCard from '../components/BouquetCard';
 import CustomButton from '../components/CustomButton';
 import QuantityStepper from '../components/QuantityStepper';
@@ -22,44 +24,27 @@ import { SCREENS } from '../constants/screens';
 
 const categories = ['Birthday', 'Romance', 'Wedding', 'Luxury', 'Spring'];
 
-const bouquets = [
-  {
-    id: '1',
-    name: 'Pink Elegance',
-    price: 49,
-    rating: 4.8,
-    reviewsCount: 128,
-    deliveryTime: 'Today',
-    imageUrl:
-      'https://images.unsplash.com/photo-1561181286-d3fee7d55364?q=80&w=800',
-  },
-  {
-    id: '2',
-    name: 'Rose Dream',
-    price: 65,
-    rating: 4.9,
-    reviewsCount: 96,
-    deliveryTime: '2 hours',
-    imageUrl:
-      'https://images.unsplash.com/photo-1563241527-3004b7be0ffd?q=80&w=800',
-  },
-  {
-    id: '3',
-    name: 'Soft Blossom',
-    price: 39,
-    rating: 4.7,
-    reviewsCount: 74,
-    deliveryTime: 'Tomorrow',
-    imageUrl:
-      'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=800',
-  },
-];
-
 export default function HomeScreen({ navigation }) {
   const [quantity, setQuantity] = useState(1);
-  const { width } = useWindowDimensions();
+  const [bouquets, setBouquets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
+  const { width } = useWindowDimensions();
   const cardWidth = width > 700 ? width / 3 - 32 : width / 2 - 24;
+
+  // Load bouquets from public REST API
+  useEffect(() => {
+    fetchBouquets()
+      .then((data) => {
+        setBouquets(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <ScrollView style={styles.screen} showsVerticalScrollIndicator={false}>
@@ -125,21 +110,32 @@ export default function HomeScreen({ navigation }) {
         <QuantityStepper value={quantity} onChange={setQuantity} />
       </View>
 
-      <View style={styles.productsGrid}>
-        {bouquets.map((item) => (
-          <BouquetCard
-            key={item.id}
-            bouquet={item}
-            width={cardWidth}
-            onPress={() =>
-              navigation.navigate(SCREENS.PRODUCT_DETAILS, {
-                product: item,
-              })
-            }
-            onAddToCart={() => console.log('Add to cart:', item.name)}
-          />
-        ))}
-      </View>
+      {loading ? (
+        <View style={styles.centerBlock}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={styles.statusText}>Loading bouquets...</Text>
+        </View>
+      ) : error ? (
+        <View style={styles.centerBlock}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : (
+        <View style={styles.productsGrid}>
+          {bouquets.map((item) => (
+            <BouquetCard
+              key={item.id}
+              bouquet={item}
+              width={cardWidth}
+              onPress={() =>
+                navigation.navigate(SCREENS.PRODUCT_DETAILS, {
+                  product: item,
+                })
+              }
+              onAddToCart={() => console.log('Add to cart:', item.name)}
+            />
+          ))}
+        </View>
+      )}
 
       <View style={styles.bottomSpace} />
     </ScrollView>
@@ -244,6 +240,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 16,
+  },
+  centerBlock: {
+    paddingVertical: 40,
+    alignItems: 'center',
+  },
+  statusText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: colors.textSecondary,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#EF4444',
+    fontWeight: '700',
   },
   bottomSpace: {
     height: 40,
