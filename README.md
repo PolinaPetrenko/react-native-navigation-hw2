@@ -1,25 +1,27 @@
-This homework adds API integration using MockAPI.
+## HW4 State Management
 
-### Features
+This homework adds Context API and Redux state management.
 
-- REST API integration
+### Context API
 
-- Fetch request in `bouquetsApi.js`
+- ThemeContext created
+- Global light / dark theme
+- Theme toggle in Profile screen
+- Theme applied to multiple screens
 
-- Dynamic bouquet rendering
+### Redux
 
-- ActivityIndicator loading state
-
-- Error handling
-
-- Navigation to Product Details
-
-### API
-
-https://6a0f34ca1736097c360b49cf.mockapi.io/bouquets
+- Redux Toolkit store configured
+- cartSlice created
+- Add and remove bouquet from cart
+- useSelector and useDispatch implemented
 
 ### Screenshots
 
-![API Home](./assets/screenshots/1.png)
+### Redux Cart
 
-![Product Details](./assets/screenshots/3.png)
+![Redux](./assets/screenshots/6.png)
+
+### Context Theme
+
+![Context](./assets/screenshots/5.png)(./assets/screenshots/4.png)
